@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "commitizen-version-bump"
+version = "0.1.0"
+description = "Commitizen customized for Meltano projects (https://commitizen-tools.github.io/commitizen/customization)"
+authors = ["Meltano <hello@meltano.com>"]
+packages = [
+    {include = "cz_version_bump"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
