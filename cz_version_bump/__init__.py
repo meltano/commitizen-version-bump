@@ -2,6 +2,12 @@ from __future__ import annotations
 
 import os
 import re
+from textwrap import dedent
+
+try:
+    from jinja2 import Template
+except ImportError:
+    from string import Template
 
 from commitizen import git
 from commitizen.cz.base import BaseCommitizen
@@ -12,6 +18,16 @@ issue_id_pattern = re.compile(r"\s+\(#(\d+)\)$")
 
 class MeltanoCommitizen(BaseCommitizen):
     commit_parser = r"^(?P<change_type>feat|fix|refactor|perf|break|docs)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?"
+    schema_pattern = r"(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:(\s.*)"
+    schema = dedent(
+        """
+        <type>(<scope>): <subject>
+        <BLANK LINE>
+        <body>
+        <BLANK LINE>
+        (BREAKING CHANGE: )<footer>
+    """
+    ).strip("\n")
     change_type_order = [
         "BREAKING CHANGES",
         "✨ New",
@@ -31,11 +47,48 @@ class MeltanoCommitizen(BaseCommitizen):
 
     def questions(self) -> Questions:
         """Questions regarding the commit message."""
-        return []
+        return [
+            {
+                "type": "list",
+                "name": "change_type",
+                "choices": [
+                    {"value": "feat", "name": "feat: A new feature."},
+                    {"value": "fix", "name": "fix: A bug fix."},
+                    {
+                        "value": "refactor",
+                        "name": "refactor: A code change that neither fixes a bug nor adds a feature.",
+                    },
+                    {
+                        "value": "perf",
+                        "name": "perf: A code change that improves performance.",
+                    },
+                    {"value": "docs", "name": "docs: A documentation change."},
+                    {"value": "break", "name": "break: A breaking change."},
+                    {
+                        "value": "chore",
+                        "name": "chore: A change that doesn't affect the meaning of the codebase.",
+                    },
+                    {"value": "style", "name": "style: A code style change."},
+                    {"value": "revert", "name": "revert: Revert to a commit."},
+                    {"value": "test", "name": "test: A test change."},
+                    {"value": "build", "name": "build: A build system change."},
+                    {"value": "ci", "name": "ci: A change to CI/CD."},
+                ],
+                "message": "Select the type of change you are committing",
+            },
+            {
+                "type": "input",
+                "name": "message",
+                "message": "Subject",
+            },
+        ]
 
     def message(self, answers: dict) -> str:
-        """Format your git message."""
-        return ""
+        """Format the git message."""
+        message_template = Template("{{change_type}}: {{message}}")
+        if getattr(Template, "substitute", None):
+            return message_template.substitute(**answers)
+        return message_template.render(**answers)
 
     def changelog_message_builder_hook(
         self,
