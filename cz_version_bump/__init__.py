@@ -13,6 +13,9 @@ from commitizen import git
 from commitizen.cz.base import BaseCommitizen
 from commitizen.defaults import Questions
 
+from cz_version_bump.git import repo_name_from_git_remote
+from cz_version_bump.thanks import Thanker
+
 issue_id_pattern = re.compile(r"\s+\(#(\d+)\)$")
 
 
@@ -44,6 +47,11 @@ class MeltanoCommitizen(BaseCommitizen):
         "docs": "📚 Documentation Improvements",
         "perf": "⚡ Performance Improvements",
     }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.repo_name = os.environ.get("GITHUB_REPOSITORY", repo_name_from_git_remote())
+        self.thanker = Thanker(self.repo_name)
 
     def questions(self) -> Questions:
         """Questions regarding the commit message."""
@@ -112,15 +120,17 @@ class MeltanoCommitizen(BaseCommitizen):
         except Exception:
             pass
         else:
-            repo = os.environ["GITHUB_REPOSITORY"]
             # NOTE: The "issue ID" will usually be for a pull request. GitHub considers PRs to be
             # issues in their APIs, but not vice versa.
             parsed_message[
                 "message"
-            ] = f"[#{issue_id}](https://github.com/{repo}/issues/{issue_id}) {message}"
+            ] = f"[#{issue_id}](https://github.com/{self.repo_name}/issues/{issue_id}) {message}"
 
         # Remove the scope because we are too inconsistent with them.
         parsed_message["scope"] = None
+
+        # Thank third-party contributors:
+        parsed_message["message"] += self.thanker.thanks_message(commit)
 
         # Remove the commit message body because is isn't needed for the changelog, and can cause
         # formatting issues if present.
