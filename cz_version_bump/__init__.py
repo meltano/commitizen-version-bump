@@ -50,7 +50,9 @@ class MeltanoCommitizen(BaseCommitizen):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.repo_name = os.environ.get("GITHUB_REPOSITORY", repo_name_from_git_remote())
+        self.repo_name = os.environ.get(
+            "GITHUB_REPOSITORY", repo_name_from_git_remote()
+        )
         self.thanker = Thanker(self.repo_name)
 
     def questions(self) -> Questions:
