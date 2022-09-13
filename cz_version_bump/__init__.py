@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+from collections import OrderedDict
 from textwrap import dedent
 
 try:
@@ -9,7 +10,7 @@ try:
 except ImportError:
     from string import Template
 
-from commitizen import git
+from commitizen import defaults, git
 from commitizen.cz.base import BaseCommitizen
 from commitizen.defaults import Questions
 
@@ -20,6 +21,25 @@ issue_id_pattern = re.compile(r"\s+\(#(\d+)\)$")
 
 
 class MeltanoCommitizen(BaseCommitizen):
+    bump_pattern = defaults.bump_pattern
+    bump_map = defaults.bump_map
+    bump_pattern = r"^(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build)(\(.+\))?(!)?"
+    bump_map = OrderedDict(
+        (
+            (r"^break", defaults.MINOR),  # A major release can only be created explicitly.
+            (r"^feat", defaults.MINOR),
+            (r"^fix", defaults.PATCH),
+            (r"^refactor", defaults.PATCH),
+            (r"^perf", defaults.PATCH),
+            (r"^docs", defaults.PATCH),
+            (r"^ci", defaults.PATCH),
+            (r"^chore", defaults.PATCH),
+            (r"^style", defaults.PATCH),
+            (r"^revert", defaults.PATCH),
+            (r"^test", defaults.PATCH),
+            (r"^build", defaults.PATCH),
+        )
+    )
     commit_parser = r"^(?P<change_type>feat|fix|refactor|perf|break|docs)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?"
     schema_pattern = r"(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:(\s.*)"
     schema = dedent(
