@@ -26,7 +26,10 @@ class MeltanoCommitizen(BaseCommitizen):
     bump_pattern = r"^(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build)(\(.+\))?(!)?"
     bump_map = OrderedDict(
         (
-            (r"^break", defaults.MINOR),  # A major release can only be created explicitly.
+            (
+                r"^break",
+                defaults.MINOR,
+            ),  # A major release can only be created explicitly.
             (r"^feat", defaults.MINOR),
             (r"^fix", defaults.PATCH),
             (r"^refactor", defaults.PATCH),
