@@ -115,6 +115,11 @@ class MeltanoCommitizen(BaseCommitizen):
             The updated parsed commit message to be written into the changelog.
         """
         message = parsed_message["message"]
+
+        # Capitalize the first letter of the message. If the message begins
+        # with punctuation, it is unaffected.
+        message = message[:1].upper() + message[1:]
+
         try:
             # Convert to int then back to str to validate that it is an integer:
             issue_id = str(int(issue_id_pattern.findall(message)[0]))
