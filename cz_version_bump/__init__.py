@@ -178,8 +178,3 @@ class MeltanoCommitizen(BaseCommitizen):
             The full changelog.
         """
         return full_changelog
-
-
-# This variable is how Commitizen finds our customizations.
-# See: https://commitizen-tools.github.io/commitizen/customization
-discover_this = MeltanoCommitizen
