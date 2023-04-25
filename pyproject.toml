@@ -8,10 +8,14 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
+commitizen = ">=3.0.0,<4.0.0"
 python = "^3.7"
 PyGithub = "^1.57"
 
 [tool.poetry.dev-dependencies]
+
+[tool.poetry.plugins."commitizen.plugin"]
+cz_version_bump = "cz_version_bump:MeltanoCommitizen"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
