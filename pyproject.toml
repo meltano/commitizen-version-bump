@@ -8,9 +8,9 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-commitizen = ">=3.0.0,<4.0.0"
-python = "^3.7"
-PyGithub = "^1.57"
+commitizen = ">=3"
+python = ">=3.8"
+PyGithub = ">=1.57"
 
 [tool.poetry.dev-dependencies]
 
