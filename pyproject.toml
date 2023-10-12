@@ -19,6 +19,9 @@ pytest-httpserver = {version = "^1.0.8", python = "<4"}
 [tool.poetry.plugins."commitizen.plugin"]
 cz_version_bump = "cz_version_bump:MeltanoCommitizen"
 
+[tool.pytest.ini_options]
+addopts = ["-vvv", "-W error"]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
