@@ -8,13 +8,13 @@ from typing import Iterable
 from warnings import warn
 
 from commitizen import git
-from github import Github
+from github import Auth, Consts, Github
 
 
 class Thanker:
     co_author_pattern = re.compile(r"<(.*)>$")
 
-    def __init__(self, repo_name: str) -> None:
+    def __init__(self, repo_name: str, base_url: str = Consts.DEFAULT_BASE_URL) -> None:
         github_token = os.environ.get(
             "INPUT_GITHUB_TOKEN", os.environ.get("GITHUB_TOKEN", None)
         )
@@ -23,7 +23,7 @@ class Thanker:
                 "No GitHub token provided - changelog may include "
                 "thanks for first-party contributors"
             )
-        self.agent = Github(github_token)
+        self.agent = Github(github_token, base_url=base_url)
         self.repo = self.agent.get_repo(repo_name)
         # NOTE: The org object obtained from `self.repo.organization` has the wrong URL, so we
         # retrieve it using `get_organization` instead to get one that isn't broken.

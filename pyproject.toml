@@ -10,9 +10,11 @@ packages = [
 [tool.poetry.dependencies]
 commitizen = ">=3"
 python = ">=3.8"
-PyGithub = ">=1.57"
+PyGithub = ">=1.59.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.2"
+pytest-httpserver = {version = "^1.0.8", python = "<4"}
 
 [tool.poetry.plugins."commitizen.plugin"]
 cz_version_bump = "cz_version_bump:MeltanoCommitizen"
