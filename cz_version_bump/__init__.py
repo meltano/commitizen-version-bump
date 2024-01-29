@@ -152,9 +152,9 @@ class MeltanoCommitizen(BaseCommitizen):
         else:
             # NOTE: The "issue ID" will usually be for a pull request. GitHub considers PRs to be
             # issues in their APIs, but not vice versa.
-            parsed_message[
-                "message"
-            ] = f"[#{issue_id}](https://github.com/{self.repo_name}/issues/{issue_id}) {message}"
+            parsed_message["message"] = (
+                f"[#{issue_id}](https://github.com/{self.repo_name}/issues/{issue_id}) {message}"
+            )
 
         # Remove the scope because we are too inconsistent with them.
         parsed_message["scope"] = None
