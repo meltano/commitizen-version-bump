@@ -8,7 +8,9 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-commitizen = ">=3"
+# TODO: Use specific broken versions in this constraint once the upstream issue is fixed
+# https://github.com/commitizen-tools/commitizen/issues/1024
+commitizen = ">=3,<3.18.2"
 python = ">=3.8"
 PyGithub = ">=1.59.1"
 
