@@ -48,7 +48,8 @@ class Thanker:
 
     def contributors(self, commit: git.GitCommit) -> Iterable[str]:
         github_commit = self.repo.get_commit(commit.rev)
-        yield github_commit.author.login
+        if github_commit.author:
+            yield github_commit.author.login
         # FIXME: Cannot thank co-authors automatically until `email_to_github_username` is implemented.
         # yield from self.co_authors(github_commit.commit.message)
 
