@@ -61,6 +61,7 @@ class MeltanoCommitizen(BaseCommitizen):
         "⚙️ Under the Hood",
         "⚡ Performance Improvements",
         "📚 Documentation Improvements",
+        "📦 Packaging changes",
     ]
     change_type_map = {
         "break": "BREAKING CHANGES",
@@ -69,6 +70,7 @@ class MeltanoCommitizen(BaseCommitizen):
         "refactor": "⚙️ Under the Hood",
         "docs": "📚 Documentation Improvements",
         "perf": "⚡ Performance Improvements",
+        "packaging": "📦 Packaging changes",
     }
 
     def __init__(self, *args, **kwargs):
@@ -106,6 +108,10 @@ class MeltanoCommitizen(BaseCommitizen):
                     {"value": "test", "name": "test: A test change."},
                     {"value": "build", "name": "build: A build system change."},
                     {"value": "ci", "name": "ci: A change to CI/CD."},
+                    {
+                        "value": "packaging",
+                        "name": "packaging: A change to how the project is packaged or distributed.",
+                    },
                 ],
                 "message": "Select the type of change you are committing",
             },
