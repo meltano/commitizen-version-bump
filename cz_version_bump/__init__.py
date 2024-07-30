@@ -23,7 +23,7 @@ issue_id_pattern = re.compile(r"\s+\(#(\d+)\)$")
 class MeltanoCommitizen(BaseCommitizen):
     bump_pattern = defaults.bump_pattern
     bump_map = defaults.bump_map
-    bump_pattern = r"^(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build)(\(.+\))?(!)?"
+    bump_pattern = r"^(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build|packaging)(\(.+\))?(!)?"
     bump_map = OrderedDict(
         (
             (
@@ -41,10 +41,11 @@ class MeltanoCommitizen(BaseCommitizen):
             (r"^revert", defaults.PATCH),
             (r"^test", defaults.PATCH),
             (r"^build", defaults.PATCH),
+            (r"^packaging", defaults.PATCH),
         )
     )
     commit_parser = r"^(?P<change_type>feat|fix|refactor|perf|break|docs)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?"
-    schema_pattern = r"(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:(\s.*)"
+    schema_pattern = r"(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build|packaging)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:(\s.*)"
     schema = dedent(
         """
         <type>(<scope>): <subject>
