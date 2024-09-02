@@ -44,7 +44,7 @@ class MeltanoCommitizen(BaseCommitizen):
             (r"^packaging", defaults.PATCH),
         )
     )
-    commit_parser = r"^(?P<change_type>feat|fix|refactor|perf|break|docs)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?"
+    commit_parser = r"^(?P<change_type>feat|fix|refactor|perf|break|docs|packaging)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?"
     schema_pattern = r"(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build|packaging)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:(\s.*)"
     schema = dedent(
         """
