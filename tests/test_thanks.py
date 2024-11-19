@@ -12,11 +12,11 @@ if t.TYPE_CHECKING:
 
 
 @pytest.fixture(autouse=True)
-def _env(monkeypatch: pytest.MonkeyPatch):
+def _env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("INPUT_GITHUB_TOKEN", "my_gh_token")
 
 
-def test_thanker(httpserver: HTTPServer):
+def test_thanker(httpserver: HTTPServer) -> None:
     org = "my_gh_org"
     repo = "my_gh_repo"
     base_url = httpserver.url_for("/")
