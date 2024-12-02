@@ -40,7 +40,7 @@ class Thanker:
         self.org = self.agent.get_organization(self.repo.organization.login)
         self.org_members = {member.login for member in self.org.get_members()}
 
-    def thanks_message(self, commit: git.GitCommit) -> str:  # noqa: ANN101
+    def thanks_message(self, commit: git.GitCommit) -> str:
         usernames = [
             f"@{username}" for username in self.third_party_contributors(commit)
         ]
