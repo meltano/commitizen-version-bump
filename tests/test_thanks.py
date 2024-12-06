@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import typing as t
 
 import pytest
@@ -16,7 +17,35 @@ def _env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("INPUT_GITHUB_TOKEN", "my_gh_token")
 
 
-def test_thanker(httpserver: HTTPServer) -> None:
+@dataclasses.dataclass
+class DummyAuthor:
+    id: int
+    login: str
+    path: str
+    type: str
+
+
+@pytest.mark.parametrize(
+    "author,expected",
+    [
+        pytest.param(
+            DummyAuthor(101, "jappleseed", "users/j.appleseed", "User"),
+            " -- _**Thanks @jappleseed!**_",
+            id="third_party_contributor",
+        ),
+        pytest.param(
+            DummyAuthor(1, "user1", "users/user1", "User"),
+            "",
+            id="org_member",
+        ),
+        pytest.param(
+            DummyAuthor(2, "dependabot[bot]", "users/dependabot[bot]", "Bot"),
+            "",
+            id="bot",
+        ),
+    ],
+)
+def test_thanker(httpserver: HTTPServer, author: DummyAuthor, expected: str) -> None:
     org = "my_gh_org"
     repo = "my_gh_repo"
     base_url = httpserver.url_for("/")
@@ -73,12 +102,13 @@ def test_thanker(httpserver: HTTPServer) -> None:
                 },
             },
             "author": {
-                "id": 101,
-                "login": "jappleseed",
-                "url": f"{base_url}users/j.appleseed",
+                "id": author.id,
+                "login": author.login,
+                "url": f"{base_url}{author.path}",
+                "type": author.type,
             },
         },
     )
 
     thanker = Thanker(f"{org}/{repo}", base_url=base_url)
-    assert thanker.thanks_message(commit) == " -- _**Thanks @jappleseed!**_"
+    assert thanker.thanks_message(commit) == expected
