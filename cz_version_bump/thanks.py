@@ -52,14 +52,14 @@ class Thanker:
         return template.format(f"{', '.join(usernames[:-1])}, and {usernames[-1]}")
 
     def third_party_contributors(self: Thanker, commit: git.GitCommit) -> Iterable[str]:
-        for contributor in self.contributors(commit):
+        for contributor, user_type in self.contributors(commit):
             # Exclude org members and dependabot from the thanks message
-            if contributor not in self.org_members and contributor != "dependabot[bot]":
+            if contributor not in self.org_members and user_type != "Bot":
                 yield contributor
 
-    def contributors(self: Thanker, commit: git.GitCommit) -> Iterable[str]:
+    def contributors(self: Thanker, commit: git.GitCommit) -> Iterable[tuple[str, str]]:
         github_commit = self.repo.get_commit(commit.rev)
-        yield github_commit.author.login
+        yield github_commit.author.login, github_commit.author.type
         # FIXME: Cannot thank co-authors automatically until `email_to_github_username`
         # is implemented.
         # yield from self.co_authors(github_commit.commit.message)  # noqa: ERA001
