@@ -7,7 +7,7 @@ import re
 import typing as t
 from warnings import warn
 
-from github import Auth, Consts, Github
+from github import Auth, Consts, Github, NamedUser
 
 if t.TYPE_CHECKING:
     from collections.abc import Iterable
@@ -53,12 +53,16 @@ class Thanker:
 
     def third_party_contributors(self: Thanker, commit: git.GitCommit) -> Iterable[str]:
         for contributor in self.contributors(commit):
-            if contributor not in self.org_members:
-                yield contributor
+            # Exclude org members and dependabot from the thanks message
+            if contributor.login not in self.org_members and contributor.type != "Bot":
+                yield contributor.login
 
-    def contributors(self: Thanker, commit: git.GitCommit) -> Iterable[str]:
+    def contributors(
+        self: Thanker,
+        commit: git.GitCommit,
+    ) -> Iterable[NamedUser.NamedUser]:
         github_commit = self.repo.get_commit(commit.rev)
-        yield github_commit.author.login
+        yield github_commit.author
         # FIXME: Cannot thank co-authors automatically until `email_to_github_username`
         # is implemented.
         # yield from self.co_authors(github_commit.commit.message)  # noqa: ERA001
