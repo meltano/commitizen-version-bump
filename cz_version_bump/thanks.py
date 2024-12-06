@@ -53,7 +53,8 @@ class Thanker:
 
     def third_party_contributors(self: Thanker, commit: git.GitCommit) -> Iterable[str]:
         for contributor in self.contributors(commit):
-            if contributor not in self.org_members:
+            # Exclude org members and dependabot from the thanks message
+            if contributor not in self.org_members and contributor != "dependabot[bot]":
                 yield contributor
 
     def contributors(self: Thanker, commit: git.GitCommit) -> Iterable[str]:
