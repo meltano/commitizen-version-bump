@@ -2,7 +2,7 @@ import subprocess
 
 
 def repo_name_from_git_remote() -> str:
-    git_remote_output = subprocess.run(  # noqa: S603
+    git_remote_output = subprocess.run(
         ("git", "remote", "-v"),
         stdout=subprocess.PIPE,
         text=True,
