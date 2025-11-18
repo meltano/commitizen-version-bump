@@ -2,22 +2,24 @@ from __future__ import annotations
 
 import os
 import re
-import typing as t
+import sys
 from collections import OrderedDict
 from textwrap import dedent
-
-try:
-    from jinja2 import Template
-except ImportError:
-    from string import Template
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from commitizen import defaults, git
 from commitizen.cz.base import BaseCommitizen
+from jinja2 import Template
 
 from cz_version_bump.git import repo_name_from_git_remote
 from cz_version_bump.thanks import Thanker
 
-if t.TYPE_CHECKING:
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override
+
+if TYPE_CHECKING:
     from commitizen.defaults import Questions
 
 issue_id_pattern = re.compile(r"\s+\(#(\d+)\)$")
@@ -25,7 +27,7 @@ issue_id_pattern = re.compile(r"\s+\(#(\d+)\)$")
 
 class MeltanoCommitizen(BaseCommitizen):
     bump_pattern = r"^(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build|packaging)(\(.+\))?(!)?"  # noqa: E501
-    bump_map: t.ClassVar = OrderedDict(
+    bump_map: ClassVar = OrderedDict(
         (
             (
                 r"^break",
@@ -75,13 +77,16 @@ class MeltanoCommitizen(BaseCommitizen):
         "packaging": "📦 Packaging changes",
     }
 
-    def __init__(self: MeltanoCommitizen, *args: t.Any, **kwargs: t.Any) -> None:
+    @override
+    def __init__(self: MeltanoCommitizen, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.repo_name = os.environ.get(
-            "GITHUB_REPOSITORY", repo_name_from_git_remote()
+            "GITHUB_REPOSITORY",
+            repo_name_from_git_remote(),
         )
         self.thanker = Thanker(self.repo_name)
 
+    @override
     def questions(self: MeltanoCommitizen) -> Questions:
         """Questions regarding the commit message."""
         return [
@@ -124,16 +129,16 @@ class MeltanoCommitizen(BaseCommitizen):
             },
         ]
 
+    @override
     def message(self: MeltanoCommitizen, answers: dict) -> str:
         """Format the git message."""
         message_template = Template("{{change_type}}: {{message}}")
-        if getattr(Template, "substitute", None):
-            return message_template.substitute(**answers)
         return message_template.render(**answers)
 
+    @override
     def changelog_message_builder_hook(
         self: MeltanoCommitizen,
-        parsed_message: dict[str, str],
+        parsed_message: dict[str, Any],
         commit: git.GitCommit,
     ) -> dict:
         """Alter each git log line of the changelog.
@@ -176,6 +181,7 @@ class MeltanoCommitizen(BaseCommitizen):
 
         return parsed_message
 
+    @override
     def changelog_hook(
         self: MeltanoCommitizen,
         full_changelog: str,
@@ -190,3 +196,11 @@ class MeltanoCommitizen(BaseCommitizen):
             The full changelog.
         """
         return full_changelog
+
+    @override
+    def example(self: MeltanoCommitizen) -> str:
+        return "feat: Add a new feature"
+
+    @override
+    def info(self: MeltanoCommitizen) -> str:
+        return "Commitizen customized for Meltano projects (https://commitizen-tools.github.io/commitizen/customization)"

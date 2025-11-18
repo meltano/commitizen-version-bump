@@ -32,7 +32,11 @@ class Thanker:
                 "thanks for first-party contributors",
                 stacklevel=2,
             )
-        self.agent = Github(auth=Auth.Token(github_token), base_url=base_url)
+            auth = None
+        else:
+            auth = Auth.Token(github_token)
+
+        self.agent = Github(auth=auth, base_url=base_url)
         self.repo = self.agent.get_repo(repo_name)
         # NOTE: The org object obtained from `self.repo.organization` has the wrong URL,
         # so we retrieve it using `get_organization` instead to get one that isn't
@@ -74,9 +78,8 @@ class Thanker:
             if line.startswith("Co-authored-by: ")
         }
         for line in co_author_lines:
-            yield self.email_to_github_username(
-                self.co_author_pattern.search(line).group(1)
-            )
+            if match := self.co_author_pattern.search(line):
+                yield self.email_to_github_username(match.group(1))
 
     # TODO: This method should use memoization - https://pypi.org/project/methodtools/
     def email_to_github_username(self: Thanker, email: str) -> str:
