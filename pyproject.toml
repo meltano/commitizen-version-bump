@@ -1,28 +1,41 @@
-[tool.poetry]
+[project]
 name = "commitizen-version-bump"
 version = "0.1.0"
 description = "Commitizen customized for Meltano projects (https://commitizen-tools.github.io/commitizen/customization)"
-authors = ["Meltano <hello@meltano.com>"]
-packages = [{ include = "cz_version_bump" }]
+authors = [{ name = "Meltano", email = "hello@meltano.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "commitizen~=4.10",
+    "jinja2>=3.1.4",
+    "PyGithub>=1.59.1",
+    "typing-extensions>=4.12.2 ; python_full_version < '3.12'",
+]
 
-[tool.poetry.dependencies]
-commitizen = ">=3"
-python = ">=3.9"
-PyGithub = ">=1.59.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.0.2"
-pytest-httpserver = { version = "^1.0.8", python = "<4" }
-
-[tool.poetry.plugins."commitizen.plugin"]
+[project.entry-points."commitizen.plugin"]
 cz_version_bump = "cz_version_bump:MeltanoCommitizen"
 
-[tool.pytest.ini_options]
+[dependency-groups]
+dev = [
+    "pytest>=9",
+    "pytest-httpserver>=1",
+]
+
+[tool.hatch.build.targets.sdist]
+include = ["cz_version_bump", "tests"]
+
+[tool.hatch.build.targets.wheel]
+include = ["cz_version_bump"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest]
 addopts = ["-vvv", "-W error"]
+minversion = "9.0"
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
 
 [tool.ruff.lint]
 select = [
@@ -57,7 +70,7 @@ select = [
     "SLOT", # flake8-slots
     "SIM",  # flake8-simplify
     "TID",  # flake8-tidy-imports
-    "TCH",  # flake8-type-checking
+    "TC",   # flake8-type-checking
     "PTH",  # flake8-use-pathlib
     "ERA",  # flake8-eradicate
     "PGH",  # pygrep-hooks
@@ -77,7 +90,3 @@ allow-star-arg-any = true
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
