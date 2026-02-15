@@ -50,10 +50,7 @@ def test_thanker(httpserver: HTTPServer, author: DummyAuthor, expected: str) -> 
     repo = "my_gh_repo"
     base_url = httpserver.url_for("/")
 
-    httpserver.expect_request(
-        f"/repos/{org}/{repo}",
-        method="GET",
-    ).respond_with_json(
+    httpserver.expect_request(f"/repos/{org}/{repo}").respond_with_json(
         {
             "id": 12,
             "name": repo,
@@ -62,10 +59,7 @@ def test_thanker(httpserver: HTTPServer, author: DummyAuthor, expected: str) -> 
         },
     )
 
-    httpserver.expect_request(
-        f"/orgs/{org}",
-        method="GET",
-    ).respond_with_json(
+    httpserver.expect_request(f"/orgs/{org}").respond_with_json(
         {
             "id": 34,
             "login": org,
@@ -73,10 +67,7 @@ def test_thanker(httpserver: HTTPServer, author: DummyAuthor, expected: str) -> 
         },
     )
 
-    httpserver.expect_request(
-        f"/orgs/{org}/members",
-        method="GET",
-    ).respond_with_json(
+    httpserver.expect_request(f"/orgs/{org}/members").respond_with_json(
         [
             {"id": 1, "login": "user1"},
             {"id": 2, "login": "user2"},
@@ -89,8 +80,7 @@ def test_thanker(httpserver: HTTPServer, author: DummyAuthor, expected: str) -> 
     commit = git.GitCommit(sha, title)
 
     httpserver.expect_request(
-        f"/repos/{org}/{repo}/commits/{commit.rev}",
-        method="GET",
+        f"/repos/{org}/{repo}/commits/{commit.rev}"
     ).respond_with_json(
         {
             "sha": commit.rev,
