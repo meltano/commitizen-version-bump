@@ -28,21 +28,33 @@ jobs:
         - "3.15"
     steps:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
-      id: setup-python
+    - name: Install uv
+      uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
       with:
         python-version: ${{ matrix.python-version }}
-        allow-prereleases: true
+        version: ">=0.9.0"
+    - name: Install dependencies
+      run: |
+        uv sync
+    - name: Run tests
+      run: |
+        uv run pytest
+
+  types:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
     - name: Install uv
       uses: astral-sh/setup-uv@eac588ad8def6316056a12d4907a9d4d84ff7a3b # v7.3.0
       with:
         version: ">=0.9.0"
     - name: Install dependencies
-      env:
-        UV_PYTHON: ${{ steps.setup-python.outputs.python-path }}
       run: |
         uv sync
-
-    - name: Run tests
+    - name: Check types with mypy
       run: |
-        uv run pytest
+        uv run mypy cz_version_bump tests
+    - name: Check types with ty
+      run: |
+        uv run ty check

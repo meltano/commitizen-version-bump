@@ -16,8 +16,17 @@ cz_version_bump = "cz_version_bump:MeltanoCommitizen"
 
 [dependency-groups]
 dev = [
+    { include-group = "tests" },
+    { include-group = "typing" },
+]
+tests = [
     "pytest>=9",
     "pytest-httpserver>=1",
+]
+typing = [
+    "mypy>=1.20.0",
+    "ty>=0.0.29",
+    { include-group = "tests" },
 ]
 
 [tool.hatch.build.targets.sdist]
