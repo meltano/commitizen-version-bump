@@ -5,7 +5,7 @@ import re
 import sys
 from collections import OrderedDict
 from textwrap import dedent
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar  # noqa: F401
 
 from commitizen import defaults, git
 from commitizen.cz.base import BaseCommitizen
@@ -20,14 +20,16 @@ else:
     from typing_extensions import override
 
 if TYPE_CHECKING:
-    from commitizen.defaults import Questions
+    from collections.abc import Mapping
+
+    from commitizen.question import CzQuestion
 
 issue_id_pattern = re.compile(r"\s+\(#(\d+)\)$")
 
 
 class MeltanoCommitizen(BaseCommitizen):
     bump_pattern = r"^(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build|packaging)(\(.+\))?(!)?"  # noqa: E501
-    bump_map: ClassVar = OrderedDict(
+    bump_map = OrderedDict(  # noqa: RUF012
         (
             (
                 r"^break",
@@ -48,16 +50,6 @@ class MeltanoCommitizen(BaseCommitizen):
         )
     )
     commit_parser = r"^(?P<change_type>feat|fix|refactor|perf|break|docs|packaging)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:\s(?P<message>.*)?"  # noqa: E501
-    schema_pattern = r"(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build|packaging)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:(\s.*)"  # noqa: E501
-    schema = dedent(
-        """
-        <type>(<scope>): <subject>
-        <BLANK LINE>
-        <body>
-        <BLANK LINE>
-        (BREAKING CHANGE: )<footer>
-    """
-    ).strip("\n")
     change_type_order = [  # noqa: RUF012
         "BREAKING CHANGES",
         "✨ New",
@@ -87,7 +79,25 @@ class MeltanoCommitizen(BaseCommitizen):
         self.thanker = Thanker(self.repo_name)
 
     @override
-    def questions(self: MeltanoCommitizen) -> Questions:
+    def schema(self: MeltanoCommitizen) -> str:
+        """Schema definition of the commit message."""
+        return dedent(
+            """
+            <type>(<scope>): <subject>
+            <BLANK LINE>
+            <body>
+            <BLANK LINE>
+            (BREAKING CHANGE: )<footer>
+        """
+        ).strip("\n")
+
+    @override
+    def schema_pattern(self: MeltanoCommitizen) -> str:
+        """Regex matching the schema used for message validation."""
+        return r"(feat|fix|refactor|perf|break|docs|ci|chore|style|revert|test|build|packaging)(?:\((?P<scope>[^()\r\n]*)\)|\()?(?P<breaking>!)?:(\s.*)"  # noqa: E501
+
+    @override
+    def questions(self: MeltanoCommitizen) -> list[CzQuestion]:
         """Questions regarding the commit message."""
         return [
             {
@@ -130,7 +140,7 @@ class MeltanoCommitizen(BaseCommitizen):
         ]
 
     @override
-    def message(self: MeltanoCommitizen, answers: dict) -> str:
+    def message(self: MeltanoCommitizen, answers: Mapping[str, Any]) -> str:
         """Format the git message."""
         message_template = Template("{{change_type}}: {{message}}")
         return message_template.render(**answers)
