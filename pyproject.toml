@@ -24,7 +24,7 @@ tests = [
     "pytest-httpserver>=1",
 ]
 typing = [
-    "mypy>=1.20.1",
+    "mypy>=1.20.2",
     "ty>=0.0.31",
     { include-group = "tests" },
 ]
