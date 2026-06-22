@@ -20,7 +20,7 @@ dev = [
     { include-group = "typing" },
 ]
 tests = [
-    "pytest>=9.1.0",
+    "pytest>=9.1.1",
     "pytest-httpserver>=1",
 ]
 typing = [
