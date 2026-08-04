@@ -6,6 +6,7 @@ requires = [ "hatchling" ]
 name = "commitizen-version-bump"
 version = "0.1.0"
 description = "Commitizen customized for Meltano projects (https://commitizen-tools.github.io/commitizen/customization)"
+readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
   "Programming Language :: Python :: 3 :: Only",
