@@ -7,7 +7,8 @@ from collections import OrderedDict
 from textwrap import dedent
 from typing import TYPE_CHECKING, Any, ClassVar  # noqa: F401
 
-from commitizen import defaults, git
+from commitizen import defaults
+from commitizen import git as cz_git
 from commitizen.cz.base import BaseCommitizen
 from jinja2 import Template
 
@@ -149,7 +150,7 @@ class MeltanoCommitizen(BaseCommitizen):
     def changelog_message_builder_hook(
         self: MeltanoCommitizen,
         parsed_message: dict[str, Any],
-        commit: git.GitCommit,
+        commit: cz_git.GitCommit,
     ) -> dict:
         """Alter each git log line of the changelog.
 
