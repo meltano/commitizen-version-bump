@@ -17,8 +17,33 @@ env:
   FORCE_COLOR: "1"
 
 jobs:
+  files-changed:
+    name: Detect file changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      runtime: ${{ steps.changes.outputs.runtime }}
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+      id: changes
+      with:
+        filters: |
+          runtime:
+            - cz_version_bump/**
+            - tests/**
+            - pyproject.toml
+            - uv.lock
+            - .github/workflows/test.yml
+
   build-package:
     name: Build & verify package
+    needs: files-changed
+    if: ${{ needs.files-changed.outputs.runtime == 'true' }}
     runs-on: ubuntu-latest
     outputs:
       supported-python-versions: ${{ steps.baipp.outputs.supported_python_classifiers_json_array }}
@@ -55,6 +80,8 @@ jobs:
 
   types:
     name: Static Analysis
+    needs: files-changed
+    if: ${{ needs.files-changed.outputs.runtime == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -73,3 +100,20 @@ jobs:
     - name: Check types with ty
       run: |
         uv run ty check
+
+  ci:
+    name: CI required checks
+    if: always()
+    needs:
+    - files-changed
+    - build-package
+    - pytest
+    - types
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+    - name: Decide whether the needed jobs succeeded or failed
+      uses: re-actors/alls-green@b5b5b37504aa4183270bd3d855c52a67f212be35 # v1.3.0
+      with:
+        jobs: ${{ toJSON(needs) }}
+        allowed-skips: build-package,pytest,types
