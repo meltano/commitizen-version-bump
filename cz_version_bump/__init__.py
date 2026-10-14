@@ -147,11 +147,11 @@ class MeltanoCommitizen(BaseCommitizen):
         return message_template.render(**answers)
 
     @override
-    def changelog_message_builder_hook(
+    def changelog_message_builder_hook(  # ty: ignore[invalid-mutable-override]
         self: MeltanoCommitizen,
-        parsed_message: dict[str, Any],
+        message: dict[str, Any],
         commit: cz_git.GitCommit,
-    ) -> dict:
+    ) -> dict[str, Any]:
         """Alter each git log line of the changelog.
 
         Parameters:
@@ -161,39 +161,39 @@ class MeltanoCommitizen(BaseCommitizen):
         Returns:
             The updated parsed commit message to be written into the changelog.
         """
-        message = parsed_message["message"]
+        message_val = message["message"]
 
         # Capitalize the first letter of the message. If the message begins
         # with punctuation, it is unaffected.
-        message = message[:1].upper() + message[1:]
+        message_val = message_val[:1].upper() + message_val[1:]
 
         try:
             # Convert to int then back to str to validate that it is an integer:
-            issue_id = str(int(issue_id_pattern.findall(message)[0]))
-            message = issue_id_pattern.sub("", message)
+            issue_id = str(int(issue_id_pattern.findall(message_val)[0]))
+            message_val = issue_id_pattern.sub("", message_val)
         except Exception:  # noqa: BLE001, S110
             pass
         else:
             # NOTE: The "issue ID" will usually be for a pull request. GitHub considers
             # PRs to be issues in their APIs, but not vice versa.
-            parsed_message["message"] = (
-                f"[#{issue_id}](https://github.com/{self.repo_name}/issues/{issue_id}) {message}"  # noqa: E501
+            message["message"] = (
+                f"[#{issue_id}](https://github.com/{self.repo_name}/issues/{issue_id}) {message_val}"  # noqa: E501
             )
 
         # Remove the scope because we are too inconsistent with them.
-        parsed_message["scope"] = None
+        message["scope"] = None
 
         # Thank third-party contributors:
-        parsed_message["message"] += self.thanker.thanks_message(commit)
+        message["message"] += self.thanker.thanks_message(commit)
 
         # Remove the commit message body because is isn't needed for the changelog, and
         # can cause formatting issues if present.
         commit.body = ""
 
-        return parsed_message
+        return message
 
     @override
-    def changelog_hook(
+    def changelog_hook(  # ty: ignore[invalid-mutable-override]
         self: MeltanoCommitizen,
         full_changelog: str,
         partial_changelog: str | None,
